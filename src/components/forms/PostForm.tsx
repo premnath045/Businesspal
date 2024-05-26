@@ -21,7 +21,7 @@ import { PostValidation } from "@/lib/validation";
 import { useToast } from "@/components/ui/use-toast";
 import { useUserContext } from "@/context/AuthContext";
 import FileUploader from "@/components/shared/FileUploader";
-import  Loader from "@/components/shared/Loader";
+// import  Loader from "@/components/shared/Loader";
 import { useCreatePost,  useUpdatePost} from "@/lib/react-query/queriesAndMutations";
 
 type PostFormProps = {
