@@ -59,3 +59,7 @@ https://github.com/appwrite/appwrite
 2. Database
 3. Storage
 
+
+### Author
+premnath k
+premnath045@gmail.com
