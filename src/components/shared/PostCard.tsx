@@ -48,7 +48,7 @@ const PostCard = ({ post }: PostCardProps) => {
         {/* creator post edit link*/}
         <Link
           to={`/update-post/${post.$id}`}
-          className={`${!post.creator.some(creator => creator.$id === user.id) && "hidden"}`}>
+          className={`${!post.creator.some((creator: { $id: string }) => creator.$id === user.id) && "hidden"}`}>
           <img
             src={"/assets/icons/edit.svg"}
             alt="edit"

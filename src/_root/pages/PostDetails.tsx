@@ -7,7 +7,6 @@ import PostStats from "@/components/shared/PostStats";
 
 import {
   useGetPostById,
-  useGetUserPosts,
   useDeletePost,
 } from "@/lib/react-query/queriesAndMutations";
 import { multiFormatDateString } from "@/lib/utils";
@@ -19,14 +18,8 @@ const PostDetails = () => {
   const { user } = useUserContext();
 
   const { data: post, isLoading } = useGetPostById(id);
-  const { data: userPosts, isLoading: isUserPostLoading } = useGetUserPosts(
-    post?.creator.$id
-  );
   const { mutate: deletePost } = useDeletePost();
 
-  const relatedPosts = userPosts?.documents.filter(
-    (userPost) => userPost.$id !== id
-  );
 
   const handleDeletePost = () => {
     deletePost({ postId: id, imageId: post?.imageId });
@@ -92,7 +85,7 @@ const PostDetails = () => {
               <div className="flex-center gap-4">
                 <Link
                   to={`/update-post/${post?.$id}`}
-                  className={`${!post.creator.some(creator => creator.$id === user.id) && "hidden"}`}>
+                  className={`${!post.creator.some((creator: { $id: string }) => creator.$id === user.id) && "hidden"}`}>
                   <img
                     src={"/assets/icons/edit.svg"}
                     alt="edit"
@@ -105,8 +98,8 @@ const PostDetails = () => {
                   onClick={handleDeletePost}
                   variant="ghost"
                   className={`post_details-delete_btn ${
-                    !post?.creator.some(creator => creator.$id === user.id) && "hidden"
-                  }`}>        
+                    !post?.creator.some((creator: { $id: string }) => creator.$id === user.id) && "hidden"
+                   }`}>     
                   <img
                     src={"/assets/icons/delete.svg"}
                     alt="delete"

@@ -1,4 +1,3 @@
-import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useToast } from "@/components/ui/use-toast"
 import { z } from 'zod'

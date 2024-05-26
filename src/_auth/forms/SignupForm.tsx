@@ -1,4 +1,3 @@
-import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useToast } from "@/components/ui/use-toast"
 import { z } from 'zod'
@@ -28,7 +27,7 @@ const SignupForm = () => {
   // calling createUserAccount through react query middleware
   const { mutateAsync: createUserAccount, isPending: isCreatingAccount } = useCreateAccount();
 
-  const { mutateAsync: signInAccount, isPending: isSigningIn } = useSignInAccount();
+  const { mutateAsync: signInAccount, isPending: isSigningInUser } = useSignInAccount();
 
   // Define form structure
   const form = useForm<z.infer<typeof signupValidation>>({
@@ -134,7 +133,7 @@ const SignupForm = () => {
             )}
           />
           <Button type="submit" className="shad-button_primary">
-              {isCreatingAccount ? (
+              {isCreatingAccount || isSigningInUser || isUserLoading ? (
                 <div className='flex-center gap-2'>
                   <Loader />
                   Loading...
