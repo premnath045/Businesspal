@@ -28,7 +28,6 @@ const AuditContent: React.FC<{ post: FirebasePost; onBack: () => void }> = ({ po
   </div>
 );
 
-
 const Home: React.FC = () => {
   const [debugInfo, setDebugInfo] = useState<string>('');
   const [loading, setLoading] = useState(true);

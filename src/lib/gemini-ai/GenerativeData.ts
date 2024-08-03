@@ -1,3 +1,4 @@
+// GenerativeData.ts file
 import { getFirestore, updateDoc, doc } from 'firebase/firestore';
 import { generateContent } from './config';
 
@@ -29,9 +30,12 @@ const GenerativeData = async (docId: string, formData: any) => {
       progress: 100
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error generating content: ", error);
-    await updateDoc(docRef, { progress: -1 }); // Indicate error state
+    await updateDoc(docRef, { 
+      progress: -1,
+      error: error.message || "An unexpected error occurred"
+    }); // Indicate error state
   }
 };
 
