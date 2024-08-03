@@ -1,84 +1,97 @@
-import { Models } from "appwrite";
-import { Link } from "react-router-dom";
+import React from 'react';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Progress } from '@/components/ui/progress';
+import { MapPin, Globe, ArrowRight, AlertCircle, CheckCircle } from 'lucide-react';
 
-import PostStats from "@/components/shared/PostStats";
-import { multiFormatDateString } from "@/lib/utils";
-import { useUserContext } from "@/context/AuthContext";
+interface FirebasePost {
+  id: string;
+  businessName: string;
+  businessDomain: string;
+  businessLocation: string;
+  description: string;
+  generatedAudit: string;
+  progress: number;
+}
 
-type PostCardProps = {
-  post: Models.Document;
-};
+interface PostCardProps {
+  post: FirebasePost;
+  onClick: () => void;
+}
 
-const PostCard = ({ post }: PostCardProps) => {
-  const { user } = useUserContext();
+const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
 
-  if (!post.creator) return;
+  const getProgressStatus = () => {
+    if (post.progress === 100) return 'complete';
+    if (post.progress === -1) return 'error';
+    if (post.progress > 0) return 'in-progress';
+    return 'not-started';
+  };
+
+  const progressStatus = getProgressStatus();
 
   return (
-    <div className="post-card">
-      <div className="flex-between">
-        <div className="flex items-center gap-3">
-          <Link to={`/profile/${post.creator.$id}`}>
-            <img
-              src={
-                post.creator?.imageUrl ||
-                "/assets/icons/profile-placeholder.svg"
-              }
-              alt="creator"
-              className="w-12 lg:h-12 rounded-full"
-            />
-          </Link>
-
-          <div className="flex flex-col">
-            <p className="base-medium lg:body-bold text-light-1">
-              {post.creator.name}
-            </p>
-            <div className="flex-center gap-2 text-light-3">
-              <p className="subtle-semibold lg:small-regular ">
-                {multiFormatDateString(post.$createdAt)}
-              </p>
-              •
-              <p className="subtle-semibold lg:small-regular">
-                {post.location}
-              </p>
-            </div>
+    <Card className="w-full cursor-pointer hover:shadow-lg transition-shadow" onClick={onClick}>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <div className="flex items-center space-x-3">
+          <Avatar className="h-8 w-8">
+            <AvatarImage src="/api/placeholder/32/32" alt="Business profile" />
+            <AvatarFallback>{post.businessName.charAt(0).toUpperCase()}</AvatarFallback>
+          </Avatar>
+          <h3 className="text-lg font-semibold">{post.businessName}</h3>
+        </div>
+        <Button variant="ghost" size="sm" className="text-blue-500 hover:text-blue-600">
+          View <ArrowRight className="ml-1 h-4 w-4" />
+        </Button>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-1 mb-3">
+          <div className="flex items-center text-sm text-gray-600">
+            <Globe className="mr-2 h-4 w-4" />
+            <span>{post.businessDomain}</span>
+          </div>
+          <div className="flex items-center text-sm text-gray-600">
+            <MapPin className="mr-2 h-4 w-4" />
+            <span>{post.businessLocation}</span>
           </div>
         </div>
-
-        {/* creator post edit link*/}
-        <Link
-          to={`/update-post/${post.$id}`}
-          className={`${!post.creator.some((creator: { $id: string }) => creator.$id === user.id) && "hidden"}`}>
-          <img
-            src={"/assets/icons/edit.svg"}
-            alt="edit"
-            width={20}
-            height={20}
+        {progressStatus !== 'not-started' && (
+          <Progress 
+            value={post.progress} 
+            className="w-full" 
+            indicatorColor={
+              progressStatus === 'complete' ? 'bg-green-500' : 
+              progressStatus === 'error' ? 'bg-red-500' : 
+              'bg-blue-500'
+            }
           />
-        </Link>
-      </div>
-
-      <Link to={`/posts/${post.$id}`}>
-        <div className="small-medium lg:base-medium py-5">
-          <p>{post.caption}</p>
-          <ul className="flex gap-1 mt-2">
-            {post.tags.map((tag: string, index: string) => (
-              <li key={`${tag}${index}`} className="text-light-3 small-regular">
-                #{tag}
-              </li>
-            ))}
-          </ul>
+        )}
+      </CardContent>
+      <CardFooter>
+        <div className="flex justify-between items-center w-full text-sm font-medium">
+          {progressStatus === 'not-started' && (
+            <span className="text-gray-500">Not started</span>
+          )}
+          {progressStatus === 'in-progress' && (
+            <>
+              <span className="text-blue-500">Generating audit...</span>
+              <span className="text-blue-500">{post.progress}%</span>
+            </>
+          )}
+          {progressStatus === 'complete' && (
+            <span className="text-green-500 flex items-center">
+              <CheckCircle className="mr-1 h-4 w-4" /> Audit complete
+            </span>
+          )}
+          {progressStatus === 'error' && (
+            <span className="text-red-500 flex items-center">
+              <AlertCircle className="mr-1 h-4 w-4" /> Error generating audit
+            </span>
+          )}
         </div>
-
-        <img
-          src={post.imageUrl || "/assets/icons/profile-placeholder.svg"}
-          alt="post image"
-          className="post-card_img"
-        />
-      </Link>
-
-      <PostStats post={post} userId={user.id} />
-    </div>
+      </CardFooter>
+    </Card>
   );
 };
 

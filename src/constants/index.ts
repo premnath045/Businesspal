@@ -14,6 +14,11 @@ export const sidebarLinks = [
       route: "/create-post",
       label: "Post property",
     },
+    {
+      imgURL: "/assets/icons/gallery-add.svg",
+      route: "/audit",
+      label: "Audit",
+    },
   ];
   
   export const bottombarLinks = [
@@ -31,5 +36,10 @@ export const sidebarLinks = [
       imgURL: "/assets/icons/gallery-add.svg",
       route: "/create-post",
       label: "Create",
+    },
+    {
+      imgURL: "/assets/icons/gallery-add.svg",
+      route: "/audit",
+      label: "Audit",
     },
   ];

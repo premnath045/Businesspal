@@ -1,7 +1,5 @@
-import { Models } from "appwrite";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-
 import { checkIsLiked } from "@/lib/utils";
 import {
   useLikePost,
@@ -10,17 +8,40 @@ import {
   useGetCurrentUser,
 } from "@/lib/react-query/queriesAndMutations"
 import { Loader } from "lucide-react";
+import firebase from "firebase/compat/app";
+
+
+// Define the structure of a post in Firebase
+interface FirebasePost {
+  id: string;
+  likes: string[]; // Array of user IDs who liked the post
+  creator: {
+    id: string;
+    name: string;
+    imageUrl: string;
+  };
+  caption: string;
+  imageUrl: string;
+  location?: string;
+  tags: string[];
+  createdAt: firebase.firestore.Timestamp;
+}
+
+// Define the structure of a saved post record
+interface SavedPostRecord {
+  id: string;
+  userId: string;
+  postId: string;
+}
 
 type PostStatsProps = {
-  post: Models.Document;
+  post: FirebasePost;
   userId: string;
 };
 
 const PostStats = ({ post, userId }: PostStatsProps) => {
   const location = useLocation();
-  const likesList = post.likes.map((user: Models.Document) => user.$id);
-
-  const [likes, setLikes] = useState<string[]>(likesList);
+  const [likes, setLikes] = useState<string[]>(post.likes);
   const [isSaved, setIsSaved] = useState(false);
 
   const { mutate: likePost } = useLikePost();
@@ -29,15 +50,14 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
 
   const { data: currentUser } = useGetCurrentUser();
 
-  const savedPostRecord = currentUser?.save.find(
-    (record: Models.Document) => record.post.$id === post.$id
+  const savedPostRecord = currentUser?.savedPosts.find(
+    (record: SavedPostRecord) => record.postId === post.id
   );
 
   useEffect(() => {
     setIsSaved(!!savedPostRecord);
   }, [currentUser, savedPostRecord]);
 
-  
   const handleLikePost = (
     e: React.MouseEvent<HTMLImageElement, MouseEvent>
   ) => {
@@ -52,7 +72,7 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
     }
 
     setLikes(likesArray);
-    likePost({ postId: post.$id, likesArray });
+    likePost({ postId: post.id, userId });
   };
 
   const handleSavePost = (
@@ -62,10 +82,10 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
 
     if (savedPostRecord) {
       setIsSaved(false);
-      return deleteSavePost(savedPostRecord.$id);
+      return deleteSavePost(savedPostRecord.id);
     }
 
-    savePost({ userId: userId, postId: post.$id });
+    savePost({ userId: userId, postId: post.id });
     setIsSaved(true);
   };
 
